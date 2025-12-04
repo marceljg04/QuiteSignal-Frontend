@@ -1,0 +1,26 @@
+@tailwind utilities;
+
+/* Layouts generales */
+.page-container {
+  @apply p-6;
+}
+
+.page-title {
+  @apply text-2xl font-bold mb-4 text-center;
+}
+
+.page-full {
+  @apply flex justify-center items-center min-h-screen bg-gray-100;
+}
+
+.page-flex-end {
+  @apply flex justify-end mb-4;
+}
+
+.ml-box {
+  @apply ml-6;
+}
+
+.auth-wrapper {
+  @apply flex items-center justify-center max-w-3xl mx-auto;
+}

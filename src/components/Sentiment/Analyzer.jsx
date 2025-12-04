@@ -1,36 +1,48 @@
 import { useState } from "react";
-import { analyzePhrase } from "../api/analyze";
+import { analyzePhrase } from "../../api/analyze";
 
 export default function Analyzer() {
   const [text, setText] = useState("");
   const [result, setResult] = useState("");
+  const [error, setError] = useState("");
 
   const handleAnalyze = async () => {
-    const res = await analyzePhrase(text);
-    setResult(res.sentiment);
+    setError("");
+    if (!text) {
+      setError("Please enter a phrase");
+      return;
+    }
+    try {
+      const res = await analyzePhrase(text);
+      if (res.success) {
+        setResult(res.data.label);
+      } else {
+        setError(res.errors || res.message || "Analysis failed");
+      }
+    } catch {
+      setError("Analysis failed");
+    }
   };
 
   return (
-    <div className="p-6 max-w-lg mx-auto">
+    <div className="analyzer-container">
+      {error && <p className="error-text">{error}</p>}
       <textarea
-        className="w-full border p-3 rounded mb-3"
-        placeholder="Escribe una frase..."
+        className="textarea"
+        placeholder="Enter a phrase..."
         onChange={(e) => setText(e.target.value)}
       ></textarea>
-
       <button
         onClick={handleAnalyze}
-        className="bg-green-600 text-white p-2 rounded w-full"
+        className="btn btn-success"
       >
-        Analizar
+        Analyze
       </button>
-
       {result && (
-        <p className="mt-4 text-xl font-bold text-center">
-          Estado emocional: {result}
+        <p className="analyzer-result">
+          Sentiment: {result}
         </p>
       )}
     </div>
   );
-
 }

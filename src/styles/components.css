@@ -1,0 +1,45 @@
+@tailwind components;
+
+/* Inputs y textarea */
+.input {
+  @apply border p-2 rounded w-full mb-3;
+}
+
+.textarea {
+  @apply w-full border p-3 rounded mb-3;
+}
+
+/* Cards */
+.card {
+  @apply flex flex-col w-80 p-6 bg-white shadow-xl rounded-xl mx-auto;
+}
+
+.card-title {
+  @apply text-2xl font-bold text-center mb-4;
+}
+
+/* Botones */
+.btn {
+  @apply p-2 rounded text-white text-center transition w-full;
+}
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700;
+}
+
+.btn-success {
+  @apply bg-green-600 hover:bg-green-700;
+}
+
+.btn-danger {
+  @apply bg-red-600 hover:bg-red-700;
+}
+
+.btn-small {
+  @apply p-2 rounded text-white text-center transition;
+}
+
+/* Errores */
+.error-text {
+  @apply text-red-500 text-center mb-3;
+}

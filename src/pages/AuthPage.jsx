@@ -6,15 +6,15 @@ export default function AuthPage() {
   const [showLogin] = useState(true);
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      {showLogin && <Login />}
-      <div className="flex flex-col justify-center ml-6">
-        <Link
-          to="/register"
-          className="bg-green-600 text-white p-2 rounded hover:bg-green-700 text-center"
-        >
-          Sign-in
-        </Link>
+    <div className="page-full">
+      <div className="auth-wrapper">
+        {showLogin && <Login />}
+
+          <div className="ml-box flex flex-col justify-center">
+          <Link to="/register" className="link-btn link-green">
+            Sign-in
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { register } from "../../api/auth";
 
 export default function Register() {
@@ -6,13 +7,29 @@ export default function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   const handleRegister = async () => {
+    setError("");
+
+    if (!name || !username || !email || !password) {
+      setError("All fields are required");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
     try {
-      const response = await register(name, username, email, password);
-      console.log(response);
-    } catch (error) {
-      console.error("Error al registrarse:", error);
+      await register(name, username, email, password);
+      navigate("/");
+    } catch (err) {
+      console.error("Registration error:", err);
+      setError(err.response?.data?.detail || "Registration failed");
     }
   };
 
@@ -20,13 +37,14 @@ export default function Register() {
     <div className="card">
       <h1 className="card-title">Register</h1>
 
+      {error && <p className="error-text">{error}</p>}
+
       <input
         className="input"
         placeholder="Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
-
 
       <input
         className="input"
@@ -55,7 +73,7 @@ export default function Register() {
         className="btn btn-success"
         onClick={handleRegister}
       >
-        Sign in
+        Register
       </button>
     </div>
   );

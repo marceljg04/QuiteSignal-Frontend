@@ -1,0 +1,11 @@
+.link-btn {
+  @apply p-2 rounded text-white text-center transition;
+}
+
+.link-green {
+  @apply bg-green-600 hover:bg-green-700;
+}
+
+.link-blue {
+  @apply bg-blue-600 hover:bg-blue-700;
+}
