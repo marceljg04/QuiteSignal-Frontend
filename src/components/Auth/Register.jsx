@@ -73,7 +73,7 @@ export default function Register() {
         className="btn btn-success"
         onClick={handleRegister}
       >
-        Register
+        Sign in
       </button>
     </div>
   );

@@ -1,11 +1,13 @@
-.link-btn {
-  @apply p-2 rounded text-white text-center transition;
-}
+@layer components {
+    .link-btn {
+        @apply py-3 px-6 rounded-xl text-white font-semibold text-center transition duration-200 inline-block; 
+    }
 
-.link-green {
-  @apply bg-green-600 hover:bg-green-700;
-}
+    .link-green {
+        @apply bg-teal-500 hover:bg-teal-600 shadow-lg hover:shadow-xl;
+    }
 
-.link-blue {
-  @apply bg-blue-600 hover:bg-blue-700;
+    .link-blue {
+        @apply bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-xl;
+    }
 }

@@ -56,7 +56,7 @@ export default function Login() {
         className="btn btn-primary"
         onClick={handleLogin}
       >
-        Log in
+        Login
       </button>
     </div>
   );

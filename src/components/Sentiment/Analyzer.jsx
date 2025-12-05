@@ -38,7 +38,7 @@ export default function Analyzer() {
       >
         Analyze
       </button>
-      {result && (
+      {result && (  
         <p className="analyzer-result">
           Sentiment: {result}
         </p>

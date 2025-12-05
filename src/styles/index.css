@@ -2,5 +2,4 @@
 @import "./components.css";
 @import "./layout.css";
 @import "./links.css";
-@import "./analyzer.css";
 @tailwind utilities;

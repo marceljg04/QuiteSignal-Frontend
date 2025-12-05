@@ -1,45 +1,43 @@
 @tailwind components;
 
-/* Inputs y textarea */
-.input {
-  @apply border p-2 rounded w-full mb-3;
-}
+@layer components {
+    .input {
+        @apply border border-gray-600 bg-gray-700 text-white p-3 rounded-lg w-full mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150; 
+    }
 
-.textarea {
-  @apply w-full border p-3 rounded mb-3;
-}
+    .textarea {
+        @apply w-full border border-gray-600 bg-gray-700 text-white p-4 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150; 
+    }
 
-/* Cards */
-.card {
-  @apply flex flex-col w-80 p-6 bg-white shadow-xl rounded-xl mx-auto;
-}
+    .card {
+        @apply flex flex-col w-full md:w-96 p-8 bg-gray-900 shadow-2xl rounded-2xl mx-auto transition duration-300; 
+    }
 
-.card-title {
-  @apply text-2xl font-bold text-center mb-4;
-}
+    .card-title {
+        @apply text-3xl font-extrabold text-white text-center mb-6; 
+    }
 
-/* Botones */
-.btn {
-  @apply p-2 rounded text-white text-center transition w-full;
-}
+    .btn {
+        @apply py-3 px-6 rounded-xl text-white font-semibold text-center transition duration-200 w-full shadow-lg hover:shadow-xl; 
+    }
+       
+    .btn-primary {
+        @apply bg-indigo-600 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50; 
+    }
 
-.btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700;
-}
+    .btn-success {
+        @apply bg-teal-500 hover:bg-teal-600 focus:ring-2 focus:ring-teal-500 focus:ring-opacity-50; 
+    }
 
-.btn-success {
-  @apply bg-green-600 hover:bg-green-700;
-}
+    .btn-danger {
+        @apply bg-rose-600 hover:bg-rose-700 focus:ring-2 focus:ring-rose-500 focus:ring-opacity-50; 
+    }
 
-.btn-danger {
-  @apply bg-red-600 hover:bg-red-700;
-}
+    .btn-small {
+        @apply py-2 px-4 rounded-lg text-white font-medium text-center transition duration-200; 
+    }
 
-.btn-small {
-  @apply p-2 rounded text-white text-center transition;
-}
-
-/* Errores */
-.error-text {
-  @apply text-red-500 text-center mb-3;
+    .error-text {
+        @apply text-red-400 font-medium text-sm text-center mb-4; 
+    }
 }

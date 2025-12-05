@@ -1,26 +1,29 @@
 @tailwind utilities;
 
-/* Layouts generales */
-.page-container {
-  @apply p-6;
-}
 
-.page-title {
-  @apply text-2xl font-bold mb-4 text-center;
-}
+@layer utilities {
+    .page-container {
+        /* Estilos para ancho y padding */
+        @apply p-6 md:p-10 max-w-7xl mx-auto; 
+    }
 
-.page-full {
-  @apply flex justify-center items-center min-h-screen bg-gray-100;
-}
+    .page-full {
+        /* Ocupa la pantalla completa y aplica el fondo */
+        @apply flex justify-center min-h-screen bg-gray-800; 
+    }
+    .page-title {
+        @apply text-3xl md:text-4xl font-extrabold mb-6 text-gray-100 text-center; 
+    }
+    
+    .page-flex-end {
+        @apply flex justify-end mb-6; 
+    }
 
-.page-flex-end {
-  @apply flex justify-end mb-4;
-}
+    .ml-box {
+        @apply ml-8; 
+    }
 
-.ml-box {
-  @apply ml-6;
-}
-
-.auth-wrapper {
-  @apply flex items-center justify-center max-w-3xl mx-auto;
+    .auth-wrapper {
+        @apply flex items-center justify-center max-w-4xl mx-auto; 
+    }
 }
