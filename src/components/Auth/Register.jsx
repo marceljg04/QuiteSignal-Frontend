@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { register } from "../../api/auth";
+import { register, login } from "../../api/auth";
+import { createJournal } from "../../api/journal";
+import { useAuth } from "../../Context/AuthContext";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -10,6 +12,7 @@ export default function Register() {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const handleRegister = async () => {
     setError("");
@@ -26,6 +29,19 @@ export default function Register() {
 
     try {
       await register(name, username, email, password);
+
+      const loginResponse = await login(username, password);
+
+      if (loginResponse.success) {
+        setUser(loginResponse.data.user);
+        navigate("/analyze");
+      } else {
+        setError(loginResponse.message || "Login failed");
+      }
+
+
+      await createJournal(username + " Journal");
+
       navigate("/");
     } catch (err) {
       console.error("Registration error:", err);
@@ -80,10 +96,7 @@ export default function Register() {
         onKeyDown={handleKeyDown}
       />
 
-      <button
-        className="btn btn-success"
-        onClick={handleRegister}
-      >
+      <button className="btn btn-success" onClick={handleRegister}>
         Sign in
       </button>
     </div>
