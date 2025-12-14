@@ -1,10 +1,30 @@
 import { useState, useRef, useEffect } from "react";
+import { getMyJournal } from "../../api/journal";
 
 export default function AnalyzerChat() {
   const [text, setText] = useState("");
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState("");
+  const [journal, setJournal] = useState(null);
   const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    const fetchJournal = async () => {
+      try {
+        const data = await getMyJournal();
+        setJournal({ id: data.data.journal_id, title: data.data.title });
+        console.log("Journal fetched:", {
+          id: data.data.journal_id,
+          title: data.data.title
+        });
+      } catch (err) {
+        console.error("Error fetching journal:", err);
+        setError("Failed to fetch journal");
+      }
+    };
+
+    fetchJournal();
+  }, []);
 
   const handleAddMessage = () => {
     const trimmedText = text.trim().slice(0, 300); // limitar a 300 caracteres
@@ -19,7 +39,6 @@ export default function AnalyzerChat() {
     ]);
     setText("");
   };
-
   const handleSendAll = () => {
     if (messages.length === 0) {
       setError("No phrases to analyze");

@@ -1,27 +1,31 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import { fetchCurrentUser } from "../api/user";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(undefined);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const data = await fetchCurrentUser();
-        if (data?.success) setUser(data.data);
-        else setUser(null);
-      } catch (err) {
-        console.error(err);
+  const loadUser = async () => {
+    try {
+      const res = await fetchCurrentUser();
+
+      if (res?.code === 200 && res.data) {
+        setUser(res.data);
+      } else {
         setUser(null);
-      } finally {
-        setLoading(false);
       }
-    };
-    loadUser();
-  }, []);
+    } catch {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadUser();
+}, []);
 
   return (
     <AuthContext.Provider value={{ user, setUser, loading }}>
@@ -30,6 +34,10 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Hook
-// eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+  return ctx;
+};

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../api/auth";
 import { useAuth } from "../../Context/AuthContext";
@@ -9,7 +9,13 @@ export default function Login() {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/analyze");
+    }
+  }, [user, navigate]);
 
   const handleLogin = async () => {
     setError("");
@@ -22,9 +28,8 @@ export default function Login() {
     try {
       const response = await login(userInput, password);
 
-      if (response.success) {
+      if (response.code && response.data?.user) {
         setUser(response.data.user);
-        navigate("/analyze");
       } else {
         setError(response.errors || response.message || "Login failed");
       }
@@ -64,10 +69,7 @@ export default function Login() {
         onKeyDown={handleKeyDown}
       />
 
-      <button
-        className="btn btn-primary"
-        onClick={handleLogin}
-      >
+      <button className="btn btn-primary" onClick={handleLogin}>
         Login
       </button>
     </div>
