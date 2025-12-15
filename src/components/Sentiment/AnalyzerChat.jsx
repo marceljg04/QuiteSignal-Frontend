@@ -1,30 +1,63 @@
 import { useState, useRef, useEffect } from "react";
-import { getMyJournal } from "../../api/journal";
+import { getMyJournal, getEntries, createEntry, appendBatch, getEntry} from "../../api/journal";
 
 export default function AnalyzerChat() {
   const [text, setText] = useState("");
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState("");
   const [journal, setJournal] = useState(null);
+  const [activeEntryId, setActiveEntryId] = useState(null);
+  const [lastSentIndex, setLastSentIndex] = useState(0);
   const messagesEndRef = useRef(null);
+  const initPromiseRef = useRef(null);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const fetchJournal = async () => {
-      try {
-        const data = await getMyJournal();
-        setJournal({ id: data.data.journal_id, title: data.data.title });
-        console.log("Journal fetched:", {
-          id: data.data.journal_id,
-          title: data.data.title
-        });
-      } catch (err) {
-        console.error("Error fetching journal:", err);
-        setError("Failed to fetch journal");
-      }
-    };
+    if (!initPromiseRef.current) {
+      initPromiseRef.current = (async () => {
+        try {
+          const journalRes = await getMyJournal();
+          const journalId = journalRes.data.journal_id;
 
-    fetchJournal();
+          setJournal({
+            id: journalId,
+            title: journalRes.data.title,
+          });
+
+          const entriesRes = await getEntries(journalId);
+          let entryId;
+          if (entriesRes.data.length === 0) {
+            const newEntry = await createEntry(journalId);
+            entryId = newEntry.data.entry_id;
+          } else {
+            const lastEntry = entriesRes.data[entriesRes.data.length - 1];
+            entryId = lastEntry.entry_id;
+          }
+          setActiveEntryId(entryId);
+
+          const entryRes = await getEntry(journalId, entryId);
+          const existingTexts = entryRes.data.texts || [];
+
+          console.log("Existing entry texts:", existingTexts);
+
+          const initialMessages = existingTexts.map(text => ({
+            text,
+            sender: "user",
+            editable: false,
+          }));
+
+          setMessages(initialMessages);
+          setLastSentIndex(initialMessages.length);
+
+          setIsReady(true);
+        } catch (err) {
+          console.error(err);
+          setError("Error initializing journal");
+        }
+      })();
+    }
   }, []);
+
 
   const handleAddMessage = () => {
     const trimmedText = text.trim().slice(0, 300); // limitar a 300 caracteres
@@ -39,27 +72,56 @@ export default function AnalyzerChat() {
     ]);
     setText("");
   };
-  const handleSendAll = () => {
-    if (messages.length === 0) {
-      setError("No phrases to analyze");
+  
+  const handleSendAll = async () => {
+    if (!isReady) {
+      setError("Journal not ready yet");
       return;
     }
 
-    const userMessagesCount = messages.filter(
-      (msg) => msg.sender === "user"
-    ).length;
+    // Obtener SOLO mensajes nuevos
+    const newMessages = messages
+      .slice(lastSentIndex)
+      .filter((msg) => msg.sender === "user")
+      .map((msg) => msg.text);
 
-    setMessages((prev) => [
-      ...prev.map((msg) =>
-        msg.sender === "user" ? { ...msg, editable: false } : msg
-      ),
-      {
-        text: `Analyzing ${userMessagesCount} phrases. This is a simulated response...`,
-        sender: "ai",
-      },
-    ]);
-    setError("");
-  };
+    if (newMessages.length === 0) {
+      setError("No new phrases to send");
+      return;
+    }
+
+    try {
+      const res = await appendBatch(journal.id, activeEntryId, newMessages);
+      console.log("Append response:", res);
+
+      // Bloquear edición de mensajes enviados
+      setMessages((prev) =>
+        prev.map((msg, idx) =>
+          idx < messages.length && msg.sender === "user"
+            ? { ...msg, editable: false }
+            : msg
+        )
+      );
+
+      // Marcar hasta dónde se envió
+      setLastSentIndex(messages.length);
+
+      // Mostrar label devuelto por el backend
+      const label = res?.data?.label ?? "unknown";
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: `Saved ${newMessages.length} new phrase${newMessages.length > 1 ? "s" : ""}. Sentiment label: ${label}`,
+          sender: "ai",
+        },
+      ]);
+
+      setError("");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to append entry");
+    }
+  }
 
   const handleEditMessage = (idx, newText) => {
     const trimmedText = newText.slice(0, 300); // limitar a 300 caracteres
@@ -167,7 +229,9 @@ export default function AnalyzerChat() {
             className="w-full py-3 font-bold text-lg rounded-xl bg-gray-700 hover:bg-gray-800 text-white transition-colors duration-150 shadow-lg disabled:opacity-30"
             onClick={handleSendAll}
             disabled={
+              !isReady ||
               messages.length === 0 ||
+              messages.length === lastSentIndex ||
               messages[messages.length - 1]?.sender === "ai"
             }
           >

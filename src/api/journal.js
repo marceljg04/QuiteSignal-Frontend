@@ -35,3 +35,11 @@ export const appendBatch = async (journalId, entryId, paragraphs = []) => {
   );
   return res.data;
 };
+
+export const getEntry = async (journalId, entryId) => {
+  const res = await axios.get(
+    `${API}/${journalId}/entries/${entryId}`,
+    { withCredentials: true }
+  );
+  return res.data;
+};

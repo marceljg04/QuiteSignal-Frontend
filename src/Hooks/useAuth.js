@@ -1,31 +1,10 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { fetchCurrentUser } from "../api/user";
+import { useContext } from "react";
+import { AuthContext } from "../Context/AuthContext";
 
 export const useAuth = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const data = await fetchCurrentUser();
-        if (!data || !data.success) {
-          navigate("/");
-        } else {
-          setUser(data.data);
-        }
-      } catch (err) {
-        console.error(err);
-        navigate("/");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkUser();
-  }, [navigate]);
-
-  return { user, loading };
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+  return ctx;
 };

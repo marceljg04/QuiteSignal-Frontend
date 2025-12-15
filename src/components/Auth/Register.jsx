@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { register, login } from "../../api/auth";
-import { createJournal } from "../../api/journal";
-import { useAuth } from "../../Context/AuthContext";
+import { useAuth } from "../../Hooks/useAuth";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -38,9 +37,6 @@ export default function Register() {
       } else {
         setError(loginResponse.message || "Login failed");
       }
-
-
-      await createJournal(username + " Journal");
 
       navigate("/");
     } catch (err) {

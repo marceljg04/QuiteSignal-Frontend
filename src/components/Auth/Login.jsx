@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../api/auth";
-import { useAuth } from "../../Context/AuthContext";
+import { useAuth } from "../../Hooks/useAuth";
 
 export default function Login() {
   const [userInput, setUserInput] = useState("");

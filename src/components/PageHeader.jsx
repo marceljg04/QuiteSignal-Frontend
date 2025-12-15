@@ -1,5 +1,5 @@
 import LogoutButton from "./Auth/Logout";
-import { useAuth } from "../Context/AuthContext";
+import { useAuth } from "../Hooks/useAuth";
 
 export default function PageHeader({ title }) {
   const { user } = useAuth();

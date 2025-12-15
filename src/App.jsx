@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AuthPage from "./pages/AuthPage";
 import RegisterPage from "./pages/RegisterPage";
 import AnalyzerPage from "./pages/AnalyzerPage";
-import { AuthProvider } from "./Context/AuthContext";
+import { AuthProvider } from "./Context/AuthProvider";
 import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
