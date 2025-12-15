@@ -62,27 +62,24 @@ export default function AnalyzerChat() {
   }, []);
 
   const loadEntry = async (entryId) => {
-    try {
-      setActiveEntryId(entryId);
-      setMessages([]);
-      setLastSentIndex(0);
-      setSentimentLabel("unknown");
+    setActiveEntryId(entryId);
+    setMessages([]);
+    setLastSentIndex(0);
 
-      const entryRes = await getEntry(journal.id, entryId);
-      const texts = entryRes.data.texts || [];
+    const entryRes = await getEntry(journal.id, entryId);
+    const texts = entryRes.data.texts || [];
 
-      const loadedMessages = texts.map(text => ({
-        text,
-        sender: "user",
-        editable: false,
-      }));
+    const loadedMessages = texts.map(text => ({
+      text,
+      sender: "user",
+      editable: false,
+    }));
 
-      setMessages(loadedMessages);
-      setLastSentIndex(loadedMessages.length);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load entry");
-    }
+    setMessages(loadedMessages);
+    setLastSentIndex(loadedMessages.length);
+
+    const storedLabels = JSON.parse(localStorage.getItem("entrySentiments") || "{}");
+    setSentimentLabel(storedLabels[entryId] || "unknown");
   };
 
   const handleAddMessage = () => {
@@ -105,7 +102,6 @@ export default function AnalyzerChat() {
       return;
     }
 
-    // Obtener SOLO mensajes nuevos
     const newMessages = messages
       .slice(lastSentIndex)
       .filter((msg) => msg.sender === "user")
@@ -120,7 +116,6 @@ export default function AnalyzerChat() {
       const res = await appendBatch(journal.id, activeEntryId, newMessages);
       console.log("Append response:", res);
 
-      // Bloquear edición de mensajes enviados
       setMessages((prev) =>
         prev.map((msg, idx) =>
           idx < messages.length && msg.sender === "user"
@@ -129,12 +124,14 @@ export default function AnalyzerChat() {
         )
       );
 
-      // Marcar hasta dónde se envió
       setLastSentIndex(messages.length);
 
-      // Mostrar label devuelto por el backend
       const label = res?.data?.label ?? "unknown";
-      setSentimentLabel(label); // 🔹 actualizar el estado del sentimiento
+      setSentimentLabel(label);
+
+      const storedLabels = JSON.parse(localStorage.getItem("entrySentiments") || "{}");
+      storedLabels[activeEntryId] = label;
+      localStorage.setItem("entrySentiments", JSON.stringify(storedLabels));
       setMessages((prev) => [
         ...prev,
         {
@@ -294,7 +291,7 @@ export default function AnalyzerChat() {
       </div>
     </div>
     {sentimentLabel !== "unknown" && (
-    <div className="absolute top-1/2 -translate-y-1/2 right-10 translate-x-[-150px] flex items-center space-x-3">
+    <div className="absolute top-1/2 -translate-y-1/2 right-10 translate-x-[-35px] flex items-center space-x-3">
       <span className="text-white font-bold text-2xl select-none">
         {sentimentLabel.toUpperCase()}
       </span>
