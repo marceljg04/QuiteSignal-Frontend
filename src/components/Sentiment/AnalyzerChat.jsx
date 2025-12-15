@@ -11,6 +11,8 @@ export default function AnalyzerChat() {
   const messagesEndRef = useRef(null);
   const initPromiseRef = useRef(null);
   const [isReady, setIsReady] = useState(false);
+  const [sentimentLabel, setSentimentLabel] = useState("unknown");
+  const [entries, setEntries] = useState([]);
 
   useEffect(() => {
     if (!initPromiseRef.current) {
@@ -25,6 +27,7 @@ export default function AnalyzerChat() {
           });
 
           const entriesRes = await getEntries(journalId);
+          setEntries(entriesRes.data || []);
           let entryId;
           if (entriesRes.data.length === 0) {
             const newEntry = await createEntry(journalId);
@@ -58,6 +61,29 @@ export default function AnalyzerChat() {
     }
   }, []);
 
+  const loadEntry = async (entryId) => {
+    try {
+      setActiveEntryId(entryId);
+      setMessages([]);
+      setLastSentIndex(0);
+      setSentimentLabel("unknown");
+
+      const entryRes = await getEntry(journal.id, entryId);
+      const texts = entryRes.data.texts || [];
+
+      const loadedMessages = texts.map(text => ({
+        text,
+        sender: "user",
+        editable: false,
+      }));
+
+      setMessages(loadedMessages);
+      setLastSentIndex(loadedMessages.length);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load entry");
+    }
+  };
 
   const handleAddMessage = () => {
     const trimmedText = text.trim().slice(0, 300); // limitar a 300 caracteres
@@ -108,10 +134,11 @@ export default function AnalyzerChat() {
 
       // Mostrar label devuelto por el backend
       const label = res?.data?.label ?? "unknown";
+      setSentimentLabel(label); // 🔹 actualizar el estado del sentimiento
       setMessages((prev) => [
         ...prev,
         {
-          text: `Saved ${newMessages.length} new phrase${newMessages.length > 1 ? "s" : ""}. Sentiment label: ${label}`,
+          text: `Saved ${newMessages.length} new paragraph${newMessages.length > 1 ? "s" : ""}.`,
           sender: "ai",
         },
       ]);
@@ -144,14 +171,39 @@ export default function AnalyzerChat() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto w-full p-4 bg-gray-800 dark:bg-gray-900 rounded-xl">
+    
+  <div className="flex max-w-7xl mx-auto w-full p-4 gap-4">
+    <div className="w-64 bg-gray-900 rounded-xl p-4 border border-gray-700 flex flex-col">
+      <h2 className="text-white font-bold mb-3">Entries</h2>
+
+      <div className="flex-1 overflow-y-auto space-y-2">
+        {entries.map(entry => (
+          <button
+            key={entry.entry_id}
+            onClick={() => loadEntry(entry.entry_id)}
+            className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
+              entry.entry_id === activeEntryId
+                ? "bg-indigo-600 text-white"
+                : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+            }`}
+          >
+            {new Date(entry.created_at).toLocaleDateString()}
+          </button>
+        ))}
+      </div>
+    </div>
+    <div className="flex-1">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold text-white">{journal?.title || "Loading..."}</h1>
+      </div>
+
       {error && (
         <div className="w-full mb-4 px-4 py-2 text-center rounded-lg bg-red-900 text-red-300 font-medium border border-red-700">
           {error}
         </div>
       )}
 
-      <div className="flex flex-col h-[75vh] bg-gray-900 rounded-xl p-4 border border-gray-700 shadow-inner">
+      <div className="relative flex flex-col h-[75vh] bg-gray-900 rounded-xl p-4 border border-gray-700 shadow-inner">
         <div className="flex-1 overflow-y-auto space-y-4 pr-2">
           {messages.length === 0 ? (
             <div className="text-center text-gray-500 py-10 select-none">
@@ -168,7 +220,7 @@ export default function AnalyzerChat() {
               >
                 {msg.sender === "user" && msg.editable ? (
                   <textarea
-                     className="px-4 py-2 max-w-[80%] flex-1 rounded-xl text-base shadow-md bg-indigo-600 text-white resize-none"
+                    className="px-4 py-2 max-w-[80%] flex-1 rounded-xl text-base shadow-md bg-indigo-600 text-white resize-none"
                     value={msg.text}
                     onChange={(e) => handleEditMessage(idx, e.target.value)}
                     rows={2}
@@ -190,6 +242,7 @@ export default function AnalyzerChat() {
           <div ref={messagesEndRef} />
         </div>
 
+        
         <hr className="my-3 border-gray-700" />
 
         <div className="pt-2">
@@ -240,5 +293,54 @@ export default function AnalyzerChat() {
         </div>
       </div>
     </div>
-  );
+    {sentimentLabel !== "unknown" && (
+    <div className="absolute top-1/2 -translate-y-1/2 right-10 translate-x-[-150px] flex items-center space-x-3">
+      <span className="text-white font-bold text-2xl select-none">
+        {sentimentLabel.toUpperCase()}
+      </span>
+
+      <button
+        className={`w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 ${
+          sentimentLabel === "positive"
+            ? "bg-green-500"
+            : sentimentLabel === "negative"
+            ? "bg-red-500"
+            : "bg-gray-400"
+        }`}
+        title={`Sentiment: ${sentimentLabel}`}
+      >
+        {sentimentLabel === "positive" && (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-10 h-10 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="3"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        )}
+        {sentimentLabel === "negative" && (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-10 h-10 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="3"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        )}
+        {sentimentLabel === "neutral" && (
+          <div className="w-6 h-6 rounded-full bg-white" />
+        )}
+      </button>
+  </div>
+)}
+
+  </div>
+  
+);
 }
