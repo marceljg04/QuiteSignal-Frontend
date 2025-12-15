@@ -169,7 +169,7 @@ export default function AnalyzerChat() {
 
   return (
     
-  <div className="flex max-w-7xl mx-auto w-full p-4 gap-4">
+  <div className="grid grid-cols-[16rem_1fr_auto] max-w-7xl mx-auto w-full p-4 gap-4">
     <div className="w-64 bg-gray-900 rounded-xl p-4 border border-gray-700 flex flex-col">
       <h2 className="text-white font-bold mb-3">Entries</h2>
 
@@ -291,14 +291,8 @@ export default function AnalyzerChat() {
       </div>
     </div>
     {sentimentLabel !== "unknown" && (
-    <div
-      className="
-        absolute top-1/2 -translate-y-1/2
-        right-4 lg:right-10 xl:right-16
-        flex items-center gap-3
-      "
-    >
-      <span className="text-white font-bold select-none
+    <div className="flex flex-col items-center justify-center">
+      <span className="ml-10 text-white font-bold select-none
         md:text-lg lg:text-xl xl:text-2xl
       ">
         {sentimentLabel.toUpperCase()}
@@ -306,7 +300,7 @@ export default function AnalyzerChat() {
 
       <button
         className={`
-          rounded-full flex items-center justify-center shadow-lg
+          mt-3 ml-10 rounded-full flex items-center justify-center shadow-lg
           transition-transform hover:scale-110
           md:w-14 md:h-14
           lg:w-16 lg:h-16
@@ -320,36 +314,36 @@ export default function AnalyzerChat() {
           }
         `}
       >
-        {sentimentLabel === "positive" && (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-10 h-10 text-white"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="3"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-        )}
-        {sentimentLabel === "negative" && (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-10 h-10 text-white"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="3"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        )}
-        {sentimentLabel === "neutral" && (
-          <div className="w-6 h-6 rounded-full bg-white" />
-        )}
-      </button>
-  </div>
-  )}
+          {sentimentLabel === "positive" && (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-10 h-10 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="3"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+          {sentimentLabel === "negative" && (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-10 h-10 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="3"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          )}
+          {sentimentLabel === "neutral" && (
+            <div className="w-6 h-6 rounded-full bg-white" />
+          )}
+        </button>
+    </div>
+    )}
   </div>  
 );
 }
