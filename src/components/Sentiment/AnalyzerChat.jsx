@@ -335,9 +335,7 @@ export default function AnalyzerChat() {
         )}
       </button>
   </div>
-)}
-
-  </div>
-  
+  )}
+  </div>  
 );
 }
