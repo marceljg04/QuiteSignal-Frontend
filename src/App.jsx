@@ -3,6 +3,7 @@ import AuthPage from "./pages/AuthPage";
 import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import JournalPage from "./pages/JournalPage";
+import PrivateRoute from "./components/Auth/PrivateRoute";
 import "./styles/index.css";
 
 function App() {
@@ -11,8 +12,22 @@ function App() {
       <Routes>
         <Route path="/" element={<AuthPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/journal" element={<JournalPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <DashboardPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/journal"
+          element={
+            <PrivateRoute>
+              <JournalPage />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

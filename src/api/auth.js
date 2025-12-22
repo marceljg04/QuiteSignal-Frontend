@@ -2,6 +2,9 @@ import axios from "axios";
 
 const API = "http://localhost:8000/auth";
 
+// Configurar axios per enviar cookies
+axios.defaults.withCredentials = true;
+
 export const register = async (name, username, email, password) => {
   const res = await axios.post(`${API}/register`, {
     name,
@@ -16,11 +19,16 @@ export const login = async (username, password) => {
   const res = await axios.post(`${API}/login`, {
     username,
     password,
-  }, { withCredentials: true });
+  });
   return res.data;
 };
 
 export const logout = async () => {
-  const res = await axios.post(`${API}/logout`, {}, { withCredentials: true });
+  const res = await axios.post(`${API}/logout`, {});
+  return res.data;
+};
+
+export const checkAuth = async () => {
+  const res = await axios.get(`${API}/me`);
   return res.data;
 };

@@ -5,6 +5,7 @@ import Calendar from "../components/Calendar/Calendar";
 import YearPixels from "../components/Calendar/YearPixels";
 import { analyzePhrase } from "../api/analyze";
 import { saveFeedback } from "../api/feedback";
+import { getAllEntries, createEntry, getEntryStats } from "../api/entries";
 
 const MOODS = [
   { value: 1, emoji: "⛈️", label: "Molt malament" },
@@ -61,9 +62,30 @@ export default function DashboardPage() {
     return streak;
   };
 
+  // Carregar entrades al muntar el component
+  const loadEntries = async () => {
+    try {
+      const response = await getAllEntries();
+      if (response.success && response.data) {
+        // Convertir format API a format frontend
+        const formattedEntries = {};
+        for (const [date, dayEntries] of Object.entries(response.data)) {
+          formattedEntries[date] = dayEntries.map((e) => ({
+            id: e.id,
+            mood: e.mood,
+            note: e.text,
+            time: e.time,
+          }));
+        }
+        setEntries(formattedEntries);
+      }
+    } catch (error) {
+      console.error("Error carregant entrades:", error);
+    }
+  };
+
   useEffect(() => {
-    // TODO: Fetch entries from API
-    setEntries({});
+    loadEntries();
   }, []);
 
   // Converteix el resultat de l'API (negative/neutral/positive + probabilitats) a mood 1-5
@@ -143,24 +165,41 @@ export default function DashboardPage() {
       }
     }
 
-    const newEntry = {
-      id: Date.now(),
-      mood: finalMood,
-      note: note.trim(),
-      time,
-    };
+    // Guardar entrada a la base de dades
+    try {
+      const response = await createEntry({
+        text: note.trim(),
+        mood: finalMood,
+        date: selectedDate,
+        time: time,
+      });
 
-    setEntries((prev) => ({
-      ...prev,
-      [selectedDate]: [...(prev[selectedDate] || []), newEntry],
-    }));
+      if (response.success && response.data) {
+        const newEntry = {
+          id: response.data.id,
+          mood: response.data.mood,
+          note: response.data.text,
+          time: response.data.time,
+        };
+
+        setEntries((prev) => ({
+          ...prev,
+          [selectedDate]: [...(prev[selectedDate] || []), newEntry],
+        }));
+
+        setJustSaved(true);
+        setTimeout(() => setJustSaved(false), 2000);
+      } else {
+        console.error("Error guardant entrada:", response.message);
+      }
+    } catch (error) {
+      console.error("Error guardant entrada:", error);
+    }
 
     setNote("");
     setDetectedMood(null);
     setAnalysisResult(null);
     setSaving(false);
-    setJustSaved(true);
-    setTimeout(() => setJustSaved(false), 2000);
   };
 
   const handleKeyDown = (e) => {
